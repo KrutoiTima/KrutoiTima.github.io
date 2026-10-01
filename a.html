@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>С Днём Рождения!</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #0b0d16;
+            background-image: 
+                radial-gradient(rgba(255, 255, 255, 0.04) 1.5px, transparent 1.5px),
+                linear-gradient(to bottom, #0d0f1d, #070811);
+            background-size: 24px 24px, 100% 100%;
+            color: #f3f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 540px;
+            background: rgba(22, 24, 31, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-zone {
+            background: rgba(30, 32, 41, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 40px 24px 30px 24px;
+            text-align: center;
+        }
+
+        .main-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .cake-img {
+            width: 130px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            filter: drop-shadow(0 10px 25px rgba(236, 72, 153, 0.25));
+        }
+
+        .gift-box {
+            background: #14151b;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .gift-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .gift-icon-wrapper {
+            width: 36px;
+            height: 36px;
+            background: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .gift-info-text h4 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .gift-info-text h4 span {
+            font-size: 11px;
+            background: #23242e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #9ca3af;
+            margin-left: 6px;
+        }
+
+        .gift-info-text p {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .key-row {
+            display: flex;
+            background: #090a0e;
+            border: 1px solid #1e2029;
+            border-radius: 12px;
+            padding: 6px 6px 6px 14px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .key-row:hover {
+            border-color: #2563eb;
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .key-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #9ca3af;
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .key-icon {
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+        }
+
+        .spoiler-container {
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #090a0e;
+        }
+
+        .key-display-text {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            padding: 2px 6px;
+            background: transparent;
+            border-radius: 4px;
+            transition: color 0.2s;
+        }
+
+        .key-display-text.revealed {
+            cursor: pointer;
+        }
+        .key-display-text.revealed:hover {
+            color: #60a5fa;
+        }
+
+        .telegram-spoiler-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #090a0e;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .telegram-spoiler-canvas.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .copy-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn:hover { background: #1d4ed8; }
+        .copy-btn:active { transform: scale(0.97); }
+
+        .copy-btn.copied {
+            background: #16a34a !important;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+            cursor: default;
+        }
+
+        /* Стиль новой кнопки активации в Steam */
+        .steam-link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: linear-gradient(135deg, #101822 0%, #17202d 100%);
+            border: 1px solid #324458;
+            color: #66c0f4;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 14px;
+            font-size: 13.5px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: border-color 0.2s, background 0.2s, color 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .steam-link-btn:hover {
+            border-color: #66c0f4;
+            background: linear-gradient(135deg, #172332 0%, #202e3f 100%);
+            color: #ffffff;
+        }
+
+        .main-content {
+            padding: 24px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .message-card-border {
+            background: transparent;
+            border: 1px solid #1e212b;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .avatar-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid #22c55e;
+            object-fit: cover;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+        }
+
+        .message-body {
+            flex-grow: 1;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .username {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .badge {
+            font-size: 11px;
+            background: #23252f;
+            color: #9ca3af;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .text-bubble {
+            background: #1e2029;
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+
+        .comment-text {
+            font-size: 13.5px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="wrapper">
+        
+        <div class="header-zone">
+            <h1 class="main-title">С Днём Рождения!</h1>
+            
+            <svg class="cake-img" viewBox="0 0 100 100" xmlns="http://w3.org">
+                <rect x="20" y="52" width="60" height="28" rx="6" fill="#ec4899"/>
+                <rect x="25" y="46" width="50" height="8" rx="4" fill="#fbcfe8"/>
+                <rect x="28" y="26" width="44" height="22" rx="6" fill="#f43f5e"/>
+                <rect x="31" y="22" width="38" height="6" rx="3" fill="#ffe4e6"/>
+                <rect x="41" y="12" width="2.5" height="12" fill="#fbbf24"/>
+                <rect x="48.5" y="9" width="2.5" height="15" fill="#10b981"/>
+                <rect x="56" y="12" width="2.5" height="12" fill="#fbbf24"/>
+                <path d="M42.2 5 C42.2 5 43.5 8 42.2 10 C41 8 42.2 5 42.2 5" fill="#f59e0b"/>
+                <path d="M49.7 2 C49.7 2 51 5 49.7 7 C48.5 5 49.7 2 49.7 2" fill="#ef4444"/>
+                <path d="M57.2 5 C57.2 5 58.5 8 57.2 10 C56 8 57.2 5 57.2 5" fill="#f59e0b"/>
+            </svg>
+
+            <div class="gift-box">
+                <div class="gift-header">
+                    <div class="gift-icon-wrapper">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                            <rect x="2" y="7" width="20" height="5"></rect>
+                            <path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+                        </svg>
+                    </div>
+                    <div class="gift-info-text">
+                        <h4>Подарочное сообщение <span>Steam</span></h4>
+                        <p>Нажми на спойлер, чтобы раскрыть сообщение</p>
+                    </div>
+                </div>
+                
+                <div class="key-row" id="keyRowBlock">
+                    <div class="key-wrapper">
+                        <span class="key-icon">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5M14 9l1.5-1.5M16.5 6.5L19 4"></path>
+                            </svg>
+                        </span>
+                        
+                        <div class="spoiler-container" id="spoilerContainer">
+                            <span class="key-display-text" id="keyText">G8NK9-4TX7W-3VPM2</span>
+                            <canvas class="telegram-spoiler-canvas" id="spoilerCanvas"></canvas>
+                        </div>
+                    </div>
+                    <button class="copy-btn" id="copyBtn" onclick="copyKey()">
+                        <svg id="btnIcon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span id="btnText">Скопировать</span>
+                    </button>
+                </div>
+
+
+                <a href="https://store.steampowered.com/account/registerkey" target="_blank" class="steam-link-btn">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 .002C5.373.002 0 5.372 0 12a12 12 0 0 0 10.334 11.867l-1.39-1.944a4.9 4.9 0 0 1-1.127-3.14c0-2.316 1.637-4.256 3.844-4.757l2.846-5.46a3.637 3.637 0 1 1 1.077.53l-2.733 5.244a4.912 4.912 0 0 1 .472 2.383 4.91 4.91 0 0 1-4.908 4.91c-.482 0-.94-.07-1.374-.198l1.493 2.088A12 12 0 0 0 24 12c0-6.627-5.373-11.998-12-11.998zm3.636 9.394a1.818 1.818 0 1 0-.001-3.637 1.818 1.818 0 0 0 .001 3.637z"/>
+                    </svg>
+                    Активировать ключ
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="section-title">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: #3b82f6;">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Личное сообщение
+            </div>
+
+            <div class="message-card-border">
+                <img src="icon.png" alt="orang3" class="avatar-img" onerror="this.src='https://ui-avatars.com'">
+                <div class="message-body">
+                    <div class="author-info">
+                        <span class="username">orang3</span>
+                        <span class="badge">автор</span>
+                    </div>
+                    <div class="text-bubble">
+                        <p class="comment-text">
+                           Йоу, у тебя сегодня др! 💝 Теперь ты стал взрослее и можешь играть в данную игру. Игра очень крутая и я не думаю что ты её когда-нибудь видел где-то, игру можно активировать со всего мира 🛡, наслаждайся! 🔥 (игру можно активировать либо в стим клиенте, либо через переход по ссылке через кнопку "Активировать ключ")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        let isRevealed = false;
+        let isCopied = false;
+        const keyText = document.getElementById('keyText');
+        const spoilerCanvas = document.getElementById('spoilerCanvas');
+        const copyBtn = document.getElementById('copyBtn');
+        const btnText = document.getElementById('btnText');
+        const btnIcon = document.getElementById('btnIcon');
+        const keyRowBlock = document.getElementById('keyRowBlock');
+
+        const ctx = spoilerCanvas.getContext('2d');
+        let animationFrameId;
+
+        function resizeCanvas() {
+            spoilerCanvas.width = spoilerCanvas.offsetWidth;
+            spoilerCanvas.height = spoilerCanvas.offsetHeight;
+        }
+
+        function drawNoise() {
+            if (isRevealed) return;
+            const w = spoilerCanvas.width;
+            const h = spoilerCanvas.height;
+            if (w === 0 || h === 0) {
+                animationFrameId = requestAnimationFrame(drawNoise);
+                return;
+            }
+            const imgData = ctx.createImageData(w, h);
+            const data = imgData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const grain = Math.random() * 65 + 30; 
+                data[i] = grain;     
+                data[i+1] = grain;   
+                data[i+2] = grain;   
+                data[i+3] = Math.random() > 0.15 ? 255 : 180; 
+            }
+            ctx.putImageData(imgData, 0, 0);
+            animationFrameId = requestAnimationFrame(drawNoise);
+        }
+
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            drawNoise();
+        });
+
+        function revealKey() {
+            if (!isRevealed) {
+                isRevealed = true;
+                cancelAnimationFrame(animationFrameId);
+                spoilerCanvas.classList.add('hidden');
+                keyText.classList.add('revealed');
+                
+                const rect = copyBtn.getBoundingClientRect();
+                initConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                
+                keyText.addEventListener('click', copyKey);
+            }
+        }
+
+        spoilerCanvas.addEventListener('click', revealKey);
+
+        function copyKey() {
+            if (isCopied) return;
+
+            if (!isRevealed) {
+                revealKey();
+            }
+
+            navigator.clipboard.writeText(keyText.innerText).then(() => {
+                isCopied = true;
+                copyBtn.classList.add('copied');
+                btnText.textContent = 'Скопировано!';
+                btnIcon.innerHTML = `<path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+                setTimeout(() => {
+                    isCopied = false;
+                    copyBtn.classList.remove('copied');
+                    btnText.textContent = 'Копировать';
+                    btnIcon.innerHTML = `
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    `;
+                }, 3000);
+            }).catch(err => console.error(err));
+        }
+
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettiArray = [];
+        const colors = ['#f43f5e', '#ec4899', '#3b82f6', '#10b981', '#fbbf24', '#a855f7'];
+
+        function initConfetti(startX, startY) {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            confettiArray = [];
+            
+            for (let i = 0; i < 100; i++) {
+                const angle = Math.random() * Math.PI + Math.PI; 
+                const speed = Math.random() * 12 + 7; 
+                
+                confettiArray.push({
+                    x: startX,
+                    y: startY,
+                    size: Math.random() * 6 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speedX: Math.cos(angle) * speed + (Math.random() * 4 - 2),
+                    speedY: Math.sin(angle) * speed - 2, 
+                    gravity: 0.35, 
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 10 - 5
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            let activeParticles = false;
+
+            confettiArray.forEach(p => {
+                if (p.y < confettiCanvas.height) {
+                    activeParticles = true;
+                    p.speedY += p.gravity; 
+                    p.y += p.speedY;
+                    p.x += p.speedX;
+                    p.rotation += p.rotationSpeed;
+
+                    confettiCtx.save();
+                    confettiCtx.translate(p.x, p.y);
+                    confettiCtx.rotate((p.rotation * Math.PI) / 180);
+                    confettiCtx.fillStyle = p.color;
+                    confettiCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.5);
+                    confettiCtx.restore();
+                }
+            });
+
+            if (activeParticles) {
+                requestAnimationFrame(animateConfetti);
+            } else {
+                confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            if (!isRevealed) resizeCanvas();
+        });
+    </script>
+</body>
+</html>
